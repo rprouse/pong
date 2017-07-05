@@ -6,13 +6,14 @@ var ballY;
 var ballSpeedX;
 var ballSpeedY;
 
-var leftPaddleY;
-var rightPaddleY;
+var paddle1Y;
+var paddle2Y;
 
 const PADDLE_WIDTH = 10;
 const PADDLE_HEIGHT = 50;
 const PADDLE_X = 10;
 const BALL_RADIUS = 5;
+const PLAYER2_SPEED = 7;
 
 window.onload = function() {
   canvas = document.getElementById('game');
@@ -21,31 +22,55 @@ window.onload = function() {
   init();
   var framesPerSecond = 30;
   setInterval(gameLoop, 1000/framesPerSecond);
+
+  canvas.addEventListener('mousemove', function(evt) {
+    var mousePos = calculateMousePos(evt);
+    paddle1Y = mousePos.y;
+  });
 }
 
 function init() {
-  ballX = 30;
-  ballY = canvas.height / 2;
   ballSpeedX = 10;
   ballSpeedY = 7;
 
-  leftPaddleY = canvas.height / 2;
-  rightPaddleY = leftPaddleY;
+  ballReset();
+
+  paddle1Y = canvas.height / 2;
+  paddle2Y = paddle1Y;
 }
 
 function gameLoop() {
   draw();
   move();
+  checkCollisions();
 }
 
 function move() {
   ballX += ballSpeedX;
   ballY += ballSpeedY;
 
-  if(ballX >= canvas.width - PADDLE_X - PADDLE_WIDTH - BALL_RADIUS)
-    ballSpeedX = -ballSpeedX;
-  else if(ballX <= PADDLE_X + PADDLE_WIDTH + BALL_RADIUS)
-    ballSpeedX = -ballSpeedX;
+  if(paddle2Y < ballY)
+    paddle2Y += PLAYER2_SPEED;
+  else if(paddle2Y > ballY)
+    paddle2Y -= PLAYER2_SPEED;
+}
+
+function checkCollisions() {
+  if(ballX >= canvas.width - PADDLE_X - PADDLE_WIDTH - BALL_RADIUS) {
+    if (ballY > paddle2Y - PADDLE_HEIGHT / 2 && ballY < paddle2Y + PADDLE_HEIGHT / 2 ) {
+      ballSpeedX = -ballSpeedX;
+    } else {
+      // TODO: Score player 1
+      ballReset();
+    }
+  } else if(ballX <= PADDLE_X + PADDLE_WIDTH + BALL_RADIUS) {
+    if (ballY > paddle1Y - PADDLE_HEIGHT / 2 && ballY < paddle1Y + PADDLE_HEIGHT / 2 ) {
+      ballSpeedX = -ballSpeedX;
+    } else {
+      // TODO: Score player 2
+      ballReset();
+    }
+  }
 
   if(ballY >= canvas.height - BALL_RADIUS)
     ballSpeedY = -ballSpeedY;
@@ -69,11 +94,28 @@ function drawBall() {
 }
 
 function drawLeftPaddle() {
-  colorRect(PADDLE_X, leftPaddleY - PADDLE_HEIGHT / 2, PADDLE_WIDTH, PADDLE_HEIGHT, 'white');
+  colorRect(PADDLE_X, paddle1Y - PADDLE_HEIGHT / 2, PADDLE_WIDTH, PADDLE_HEIGHT, 'white');
 }
 
 function drawRightPaddle() {
-  colorRect(canvas.width - PADDLE_X - PADDLE_WIDTH, rightPaddleY - PADDLE_HEIGHT / 2, PADDLE_WIDTH, PADDLE_HEIGHT, 'white');
+  colorRect(canvas.width - PADDLE_X - PADDLE_WIDTH, paddle2Y - PADDLE_HEIGHT / 2, PADDLE_WIDTH, PADDLE_HEIGHT, 'white');
+}
+
+function ballReset() {
+  ballX = canvas.width/2;
+  ballY = canvas.height/2;
+  ballSpeedX = -ballSpeedX;
+}
+
+function calculateMousePos(evt) {
+  var rect = canvas.getBoundingClientRect();
+  var root = document.documentElement;
+  var mouseX = evt.clientX - rect.left - root.scrollLeft;
+  var mouseY = evt.clientY - rect.top - root.scrollTop;
+  return {
+    x: mouseX,
+    y: mouseY
+  };
 }
 
 function colorRect(x, y, width, height, color) {
