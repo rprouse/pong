@@ -1,5 +1,5 @@
 var canvas;
-var canvasContext;
+var ctx;
 
 var ballX;
 var ballY;
@@ -9,6 +9,9 @@ var ballSpeedY;
 var paddle1Y;
 var paddle2Y;
 
+var score1;
+var score2;
+
 const PADDLE_WIDTH = 10;
 const PADDLE_HEIGHT = 50;
 const PADDLE_X = 10;
@@ -17,7 +20,7 @@ const PLAYER2_SPEED = 7;
 
 window.onload = function() {
   canvas = document.getElementById('game');
-  canvasContext = canvas.getContext('2d');
+  ctx = canvas.getContext('2d');
 
   init();
   var framesPerSecond = 30;
@@ -32,6 +35,9 @@ window.onload = function() {
 function init() {
   ballSpeedX = 10;
   ballSpeedY = 7;
+
+  score1 = 0;
+  score2 = 0;
 
   ballReset();
 
@@ -60,14 +66,14 @@ function checkCollisions() {
     if (ballY > paddle2Y - PADDLE_HEIGHT / 2 && ballY < paddle2Y + PADDLE_HEIGHT / 2 ) {
       ballSpeedX = -ballSpeedX;
     } else {
-      // TODO: Score player 1
+      score1++;
       ballReset();
     }
   } else if(ballX <= PADDLE_X + PADDLE_WIDTH + BALL_RADIUS) {
     if (ballY > paddle1Y - PADDLE_HEIGHT / 2 && ballY < paddle1Y + PADDLE_HEIGHT / 2 ) {
       ballSpeedX = -ballSpeedX;
     } else {
-      // TODO: Score player 2
+      score2++;
       ballReset();
     }
   }
@@ -80,9 +86,12 @@ function checkCollisions() {
 
 function draw() {
   drawBackground();
+  drawCenterline();
   drawBall();
   drawLeftPaddle();
   drawRightPaddle();
+  drawPlayer1Score();
+  drawPlayer2Score();
 }
 
 function drawBackground() {
@@ -99,6 +108,24 @@ function drawLeftPaddle() {
 
 function drawRightPaddle() {
   colorRect(canvas.width - PADDLE_X - PADDLE_WIDTH, paddle2Y - PADDLE_HEIGHT / 2, PADDLE_WIDTH, PADDLE_HEIGHT, 'white');
+}
+
+function drawCenterline() {
+  // TODO:
+}
+
+function drawPlayer1Score() {
+  ctx.fillStyle = 'green';
+  ctx.font = '48px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(score1, canvas.width / 4, 50);
+}
+
+function drawPlayer2Score() {
+  ctx.fillStyle = 'green';
+  ctx.font = '48px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(score2, canvas.width - canvas.width / 4, 50);
 }
 
 function ballReset() {
@@ -119,13 +146,13 @@ function calculateMousePos(evt) {
 }
 
 function colorRect(x, y, width, height, color) {
-  canvasContext.fillStyle = color;
-  canvasContext.fillRect(x, y, width, height);
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, width, height);
 }
 
 function colorCircle(centerX, centerY, radius, color) {
-  canvasContext.fillStyle = color;
-  canvasContext.beginPath();
-  canvasContext.arc(centerX, centerY, radius, 0, Math.PI*2, true);
-  canvasContext.fill();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI*2, true);
+  ctx.fill();
 }
