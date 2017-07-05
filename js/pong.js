@@ -111,7 +111,12 @@ function drawRightPaddle() {
 }
 
 function drawCenterline() {
-  // TODO:
+  ctx.strokeStyle = 'white';
+  ctx.beginPath();
+  ctx.setLineDash([18, 16]);
+  ctx.moveTo(canvas.width/2, 2);
+  ctx.lineTo(canvas.width/2, canvas.height);
+  ctx.stroke();
 }
 
 function drawPlayer1Score() {
