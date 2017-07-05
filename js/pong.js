@@ -3,7 +3,8 @@ var canvasContext;
 
 var ballX;
 var ballY;
-var ballSpeed;
+var ballSpeedX;
+var ballSpeedY;
 
 var leftPaddleY;
 var rightPaddleY;
@@ -20,7 +21,8 @@ window.onload = function() {
 function init() {
   ballX = 30;
   ballY = canvas.height / 2;
-  ballSpeed = 10;
+  ballSpeedX = 10;
+  ballSpeedY = 0;
 
   leftPaddleY = canvas.height / 2;
   rightPaddleY = leftPaddleY;
@@ -32,11 +34,13 @@ function gameLoop() {
 }
 
 function move() {
-  ballX += ballSpeed;
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+
   if(ballX >= canvas.width - 20)
-    ballSpeed = -ballSpeed;
+    ballSpeedX = -ballSpeedX;
   else if(ballX <= 20)
-    ballSpeed = -ballSpeed;
+    ballSpeedX = -ballSpeedX;
 }
 
 function draw() {
@@ -47,21 +51,22 @@ function draw() {
 }
 
 function drawBackground() {
-  canvasContext.fillStyle = 'black';
-  canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+  colorRect(0, 0, canvas.width, canvas.height, 'black');
 }
 
 function drawBall() {
-  canvasContext.fillStyle = 'white';
-  canvasContext.fillRect(ballX - 5, ballY - 5, 10, 10)
+  colorRect(ballX - 5, ballY - 5, 10, 10, 'white');
 }
 
 function drawLeftPaddle() {
-  canvasContext.fillStyle = 'white';
-  canvasContext.fillRect(10, leftPaddleY - 25, 10, 50)
+  colorRect(10, leftPaddleY - 25, 10, 50, 'white');
 }
 
 function drawRightPaddle() {
-  canvasContext.fillStyle = 'white';
-  canvasContext.fillRect(canvas.width - 20, rightPaddleY - 25, 10, 50)
+  colorRect(canvas.width - 20, rightPaddleY - 25, 10, 50, 'white');
+}
+
+function colorRect(x, y, width, height, color) {
+  canvasContext.fillStyle = color;
+  canvasContext.fillRect(x, y, width, height);
 }
