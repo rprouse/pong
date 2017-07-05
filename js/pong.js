@@ -64,14 +64,14 @@ function move() {
 function checkCollisions() {
   if(ballX >= canvas.width - PADDLE_X - PADDLE_WIDTH - BALL_RADIUS) {
     if (ballY > paddle2Y - PADDLE_HEIGHT / 2 && ballY < paddle2Y + PADDLE_HEIGHT / 2 ) {
-      ballSpeedX = -ballSpeedX;
+      bounceOffPaddle(paddle2Y);
     } else {
       score1++;
       ballReset();
     }
   } else if(ballX <= PADDLE_X + PADDLE_WIDTH + BALL_RADIUS) {
     if (ballY > paddle1Y - PADDLE_HEIGHT / 2 && ballY < paddle1Y + PADDLE_HEIGHT / 2 ) {
-      ballSpeedX = -ballSpeedX;
+      bounceOffPaddle(paddle1Y);
     } else {
       score2++;
       ballReset();
@@ -82,6 +82,11 @@ function checkCollisions() {
     ballSpeedY = -ballSpeedY;
   else if(ballY <= BALL_RADIUS)
     ballSpeedY = -ballSpeedY;
+}
+
+function bounceOffPaddle(paddleY) {
+      ballSpeedX = -ballSpeedX;
+      ballSpeedY = ballY - paddleY;
 }
 
 function draw() {
@@ -137,6 +142,13 @@ function ballReset() {
   ballX = canvas.width/2;
   ballY = canvas.height/2;
   ballSpeedX = -ballSpeedX;
+  ballSpeedY = getRandomIntInclusive(-10, 10);
+}
+
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
 }
 
 function calculateMousePos(evt) {
