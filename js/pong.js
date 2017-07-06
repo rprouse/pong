@@ -12,11 +12,14 @@ var paddle2Y;
 var score1;
 var score2;
 
+var showingWin = false;
+
 const PADDLE_WIDTH = 10;
 const PADDLE_HEIGHT = 50;
 const PADDLE_X = 10;
 const BALL_RADIUS = 5;
 const PLAYER2_SPEED = 7;
+const WIN_SCORE = 5;
 
 window.onload = function() {
   canvas = document.getElementById('game');
@@ -26,7 +29,15 @@ window.onload = function() {
   var framesPerSecond = 30;
   setInterval(gameLoop, 1000/framesPerSecond);
 
+  canvas.addEventListener('mousedown', function(evt) {
+    if(showingWin) {
+      showingWin = false;
+      init();
+    }
+  });
+
   canvas.addEventListener('mousemove', function(evt) {
+    if(showingWin) return;
     var mousePos = calculateMousePos(evt);
     paddle1Y = mousePos.y;
   });
@@ -34,7 +45,6 @@ window.onload = function() {
 
 function init() {
   ballSpeedX = 10;
-  ballSpeedY = 7;
 
   score1 = 0;
   score2 = 0;
@@ -47,17 +57,21 @@ function init() {
 
 function gameLoop() {
   draw();
-  move();
-  checkCollisions();
+  if(showingWin) {
+    drawWin();
+  } else {
+    move();
+    checkCollisions();
+  }
 }
 
 function move() {
   ballX += ballSpeedX;
   ballY += ballSpeedY;
 
-  if(paddle2Y < ballY)
+  if(paddle2Y < ballY - PADDLE_HEIGHT / 4)
     paddle2Y += PLAYER2_SPEED;
-  else if(paddle2Y > ballY)
+  else if(paddle2Y > ballY + PADDLE_HEIGHT / 4)
     paddle2Y -= PLAYER2_SPEED;
 }
 
@@ -86,7 +100,8 @@ function checkCollisions() {
 
 function bounceOffPaddle(paddleY) {
       ballSpeedX = -ballSpeedX;
-      ballSpeedY = ballY - paddleY;
+      var deltaY = ballY - paddleY;
+      ballSpeedY = deltaY * 0.4;
 }
 
 function draw() {
@@ -138,11 +153,27 @@ function drawPlayer2Score() {
   ctx.fillText(score2, canvas.width - canvas.width / 4, 50);
 }
 
+function drawWin() {
+  ctx.fillStyle = 'yellow';
+  ctx.font = '48px sans-serif';
+  ctx.textAlign = 'center';
+  var winner = score1 >= WIN_SCORE ? "You Win!!!" : "Computer Wins!!!";
+  ctx.fillText(winner, canvas.width / 2, canvas.height / 2);
+
+  ctx.fillStyle = 'white';
+  ctx.font = '24px sans-serif';
+  ctx.fillText("Click to play again", canvas.width / 2, canvas.height - canvas.height / 4);
+}
+
 function ballReset() {
-  ballX = canvas.width/2;
-  ballY = canvas.height/2;
-  ballSpeedX = -ballSpeedX;
-  ballSpeedY = getRandomIntInclusive(-10, 10);
+  if(score1 >= WIN_SCORE || score2 >= WIN_SCORE) {
+    showingWin = true;
+  } else {
+    ballSpeedX = -ballSpeedX;
+    ballSpeedY = getRandomIntInclusive(-10, 10);
+    ballX = canvas.width/2;
+    ballY = canvas.height/2;
+  }
 }
 
 function getRandomIntInclusive(min, max) {
